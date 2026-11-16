@@ -41,7 +41,7 @@ export interface Experience {
   duration?: string;
   start_date?: string;
   end_date?: string;
-  responsibilities?: string;
+ responsibilities?: string | string[];
   description?: string;
   sort_order?: number;
   [key: string]: any;
