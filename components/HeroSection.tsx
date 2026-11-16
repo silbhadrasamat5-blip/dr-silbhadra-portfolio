@@ -41,22 +41,21 @@ export default function HeroSection({ profile, onRefresh }: Props) {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* ── Solid-to-Fade Pearl-Aqua Overlay ─────────────────────────────── */}
+     {/* ── Solid-to-Fade Pearl-Aqua Overlay ─────────────────────────────── */}
       <div
-        className="absolute inset-0 z-[1] pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
           background:
             'linear-gradient(to right, #FAF9F6 0%, #F2FAFA 46%, rgba(242,250,250,0.92) 56%, rgba(250,249,246,0.2) 68%, transparent 80%)',
-        }}
       />
 
-    {/* ── 3D Molecule — full canvas shifted slightly down so name stays clear ── */}
-      <div className="absolute inset-0 z- pointer-events-none translate-y-16 opacity-75">
+      {/* ── 3D Molecule — lower-middle & visible above overlay ───────────── */}
+      <div className="absolute inset-0 z-10 pointer-events-none translate-y-20 opacity-80">
         <ThreeMoleculeCanvas />
       </div>
 
       {/* ── Hero content ─────────────────────────────────────────────────── */}
-      <div className="relative z-[10] max-w-7xl mx-auto px-6 lg:px-14 py-28 w-full">
+      <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-14 py-28 w-full">
         <div className="max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
