@@ -100,7 +100,6 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
       className="relative py-24 bg-[#FAF9F6]/88 backdrop-blur-sm"
     >
       <div className="max-w-5xl mx-auto px-6" ref={ref}>
-        {/* Heading */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -125,9 +124,7 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
           )}
         </motion.div>
 
-        {/* Timeline */}
         <div className="relative">
-          {/* Vertical line */}
           <div className="absolute left-6 top-0 bottom-0 w-0.5 timeline-line rounded-full hidden md:block" />
 
           <div className="space-y-8">
@@ -139,7 +136,6 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
                 transition={{ duration: 0.55, delay: i * 0.12 }}
                 className="relative md:pl-16"
               >
-                {/* Timeline dot */}
                 <div className="absolute left-4 top-6 w-4 h-4 rounded-full bg-teal-600 border-2 border-white shadow-md hidden md:block" />
 
                 <div className="bg-white/95 backdrop-blur-md border border-teal-100/80 shadow-md rounded-2xl p-6 group">
@@ -203,7 +199,6 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
         </div>
       </div>
 
-      {/* Edit / Add Modal */}
       {editing && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto">
@@ -262,8 +257,6 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Start Year/Date
                   </label>
                   <input
@@ -275,7 +268,7 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                   />
                 </div>
-                <div>
+               <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     End Date (blank = Present)
                   </label>
