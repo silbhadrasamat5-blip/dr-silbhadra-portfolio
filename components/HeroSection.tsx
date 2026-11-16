@@ -54,7 +54,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
       />
 
       {/* ── 3D Molecule — lower-middle & visible above overlay ───────────── */}
-      <div className="absolute inset-0 z-10 pointer-events-none translate-y-20 opacity-80">
+     <div className="hidden md:flex items-center justify-center absolute left-[31%] bottom-[-10px] w-[460px] h-[460px] z-10 pointer-events-none scale-75 origin-bottom opacity-90">
         <ThreeMoleculeCanvas />
       </div>
 
