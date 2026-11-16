@@ -2,112 +2,187 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Custom Properties ─────────────────────────────── */
 :root {
-  --bg:          #0D0907;
-  --bg-soft:     #130E0B;
-  --gold:        #D97706;
-  --amber:       #F59E0B;
-  --amber-light: #FDE68A;
-  --text:        #E7D7C1;
-  --text-muted:  #9A8878;
+  --font-playfair: 'Playfair Display', serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* ── Base ──────────────────────────────────────────── */
 * { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: var(--font-jakarta), system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  background-color: #FAF9F6;
+  color: #334155;
+  font-family: var(--font-jakarta);
+  overflow-x: hidden;
 }
 
-::selection { background: rgba(217,119,6,.35); }
-
-/* ── Scrollbar ─────────────────────────────────────── */
-::-webkit-scrollbar       { width: 5px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
-
-/* ── Utility classes ───────────────────────────────── */
+/* ── Frosted Glass Card ───────────────────────────────────── */
 .glass-card {
-  background: rgba(255,255,255,.04);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(245,158,11,.18);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(45, 212, 191, 0.35);
+  box-shadow: 0 4px 24px rgba(13, 148, 136, 0.08), 0 1px 4px rgba(0,0,0,0.04);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.glass-card-hover {
-  transition: border-color .3s, box-shadow .3s, transform .3s;
-}
-.glass-card-hover:hover {
-  border-color: rgba(245,158,11,.4);
-  box-shadow: 0 0 32px rgba(217,119,6,.18);
-  transform: translateY(-3px);
+.glass-card:hover {
+  box-shadow: 0 8px 36px rgba(13, 148, 136, 0.14), 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.gold-text {
-  background: linear-gradient(135deg,#D97706,#F59E0B,#FBBF24);
+/* ── Accent text gradient ─────────────────────────────────── */
+.accent-text {
+  background: linear-gradient(135deg, #0D9488, #0284C7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.gold-border { border-color: rgba(245,158,11,.25); }
-
-.btn-gold {
-  background: linear-gradient(135deg,#D97706,#F59E0B);
-  color: #0D0907;
-  font-weight: 700;
-  border-radius: 50px;
-  padding: .75rem 2rem;
-  transition: opacity .2s, transform .2s, box-shadow .2s;
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #0D9488, #0284C7);
+  color: #fff;
+  border: none;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: var(--font-jakarta);
+  cursor: pointer;
+  transition: opacity 0.25s, transform 0.25s, box-shadow 0.25s;
+  text-decoration: none;
 }
-.btn-gold:hover {
-  opacity: .9;
+
+.btn-primary:hover {
+  opacity: 0.9;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(217,119,6,.35);
+  box-shadow: 0 8px 25px rgba(13, 148, 136, 0.35);
 }
 
-.btn-outline-gold {
-  border: 1.5px solid rgba(245,158,11,.5);
-  color: #F59E0B;
-  border-radius: 50px;
-  padding: .75rem 2rem;
-  transition: border-color .2s, background .2s, transform .2s;
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: #0D9488;
+  border: 1.5px solid #0D9488;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  font-family: var(--font-jakarta);
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s, transform 0.25s;
+  text-decoration: none;
 }
-.btn-outline-gold:hover {
-  border-color: #F59E0B;
-  background: rgba(245,158,11,.08);
+
+.btn-outline:hover {
+  background: #0D9488;
+  color: #fff;
   transform: translateY(-2px);
 }
 
-/* ── Section heading accent ────────────────────────── */
+/* ── Section label ───────────────────────────────────────── */
 .section-label {
   display: inline-block;
-  font-family: var(--font-jakarta), sans-serif;
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .18em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #F59E0B;
-  margin-bottom: .5rem;
+  color: #0D9488;
+  margin-bottom: 0.5rem;
 }
 
-/* ── Admin badge ───────────────────────────────────── */
+/* ── Admin banner ────────────────────────────────────────── */
 .admin-banner {
   position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 9999;
-  background: linear-gradient(90deg,#D97706,#F59E0B);
-  color: #0D0907;
-  font-weight: 700;
-  font-size: .8rem;
-  letter-spacing: .08em;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: linear-gradient(135deg, #0D9488, #0284C7);
+  color: #fff;
   text-align: center;
-  padding: .4rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: var(--font-jakarta);
+}
+
+/* ── Input fields ────────────────────────────────────────── */
+.input-field {
+  display: block;
+  width: 100%;
+  background: rgba(255,255,255,0.92);
+  border: 1.5px solid rgba(45, 212, 191, 0.4);
+  border-radius: 0.5rem;
+  padding: 0.65rem 1rem;
+  color: #0F172A;
+  font-family: var(--font-jakarta);
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #0D9488;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+}
+
+textarea.input-field {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* ── Badge ───────────────────────────────────────────────── */
+.badge-primary {
+  display: inline-block;
+  background: rgba(13, 148, 136, 0.10);
+  color: #0D9488;
+  border: 1px solid rgba(13, 148, 136, 0.28);
+  border-radius: 9999px;
+  padding: 0.22rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-jakarta);
+}
+
+.badge-secondary {
+  display: inline-block;
+  background: rgba(2, 132, 199, 0.10);
+  color: #0284C7;
+  border: 1px solid rgba(2, 132, 199, 0.28);
+  border-radius: 9999px;
+  padding: 0.22rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-jakarta);
+}
+
+/* ── Timeline ────────────────────────────────────────────── */
+.timeline-line {
+  background: linear-gradient(to bottom, #0D9488, #0284C7, #0D9488);
+}
+
+/* ── Section tint (lets fixed video bleed through softly) ─── */
+.section-tint {
+  background: rgba(250, 249, 246, 0.72);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* ── Shake animation for wrong PIN ──────────────────────── */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-6px); }
+  80%       { transform: translateX(6px); }
+}
+
+.shake {
+  animation: shake 0.4s ease-in-out;
 }

@@ -1,136 +1,145 @@
 'use client'
-import { useRef, useState } from 'react'
+
+import { useState, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Award, ExternalLink, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Plus, Edit3, Trash2, Award, ExternalLink } from 'lucide-react'
 import { useAdmin } from '@/contexts/AdminContext'
 import { supabase } from '@/lib/supabase'
 import type { Certificate } from '@/types'
 
-const blank: Omit<Certificate,'id'> = { title: '', issuer: '', issue_date: '', credential_url: '', sort_order: 99 }
+interface Props {
+  items: Certificate[]
+  onRefresh: () => void
+}
 
-export default function CertificatesSection({
-  certs, onRefresh,
-}: { certs: Certificate[]; onRefresh: () => void }) {
-  const { isAdmin } = useAdmin()
-  const ref         = useRef(null)
-  const inView      = useInView(ref, { once: true, margin: '-60px' })
+const BLANK: Partial<Certificate> = { name: '', issuer: '', year: '', credential_url: '' }
 
-  const [editing, setEditing] = useState<Certificate | null>(null)
-  const [form,    setForm]    = useState<Omit<Certificate,'id'>>(blank)
-  const [saving,  setSaving]  = useState(false)
+export default function CertificatesSection({ items, onRefresh }: Props) {
+  const { isAdmin }               = useAdmin()
+  const ref                       = useRef(null)
+  const inView                    = useInView(ref, { once: true, margin: '-80px' })
+  const [editing, setEditing]     = useState<Certificate | null>(null)
+  const [isNew,   setIsNew]       = useState(false)
+  const [form,    setForm]        = useState<Partial<Certificate>>(BLANK)
+  const [saving,  setSaving]      = useState(false)
 
-  const openEdit = (item: Certificate) => { setEditing(item); setForm({ ...item }) }
-  const openAdd  = () => { setEditing({ id: undefined, ...blank }); setForm({ ...blank }) }
+  const openEdit = (item: Certificate) => { setIsNew(false); setForm({ ...item }); setEditing(item) }
+  const openAdd  = ()                  => { setIsNew(true);  setForm({ ...BLANK }); setEditing({} as Certificate) }
+  const close    = ()                  => { setEditing(null); setIsNew(false) }
 
   const save = async () => {
     if (!supabase) return
     setSaving(true)
-    if (editing?.id) {
-      await supabase.from('certificates').update(form).eq('id', editing.id)
-    } else {
-      await supabase.from('certificates').insert(form)
-    }
-    setSaving(false); setEditing(null); onRefresh()
+    if (isNew) await supabase.from('certificates').insert(form)
+    else       await supabase.from('certificates').update(form).eq('id', editing!.id)
+    setSaving(false); close(); onRefresh()
   }
+
   const del = async (id: string) => {
-    if (!supabase || !confirm('Delete?')) return
+    if (!supabase || !confirm('Delete this certificate?')) return
     await supabase.from('certificates').delete().eq('id', id)
     onRefresh()
   }
 
   return (
-    <section id="certificates" className="py-24 bg-[#130E0B]" ref={ref}>
-      <div className="max-w-6xl mx-auto px-6 lg:px-16">
+    <section id="certificates" className="relative py-24 section-tint">
+      <div className="max-w-6xl mx-auto px-6" ref={ref}>
 
-        <div className="flex items-start justify-between mb-12">
-          <div>
-            <span className="section-label">Credentials</span>
-            <h2 className="font-playfair text-4xl md:text-5xl font-bold gold-text">Certifications</h2>
-          </div>
-          {isAdmin && (
-            <button onClick={openAdd}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-sm font-jakarta hover:bg-amber-500/25 transition-all"
-            >
-              <Plus size={15} /> Add
-            </button>
-          )}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-14"
+        >
+          <span className="section-label">Credentials</span>
+          <h2 className="font-playfair text-4xl font-bold text-[#0F172A] mt-1">
+            Certifications &amp; Training
+          </h2>
+        </motion.div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {certs.map((cert, i) => (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {items.map((item, i) => (
             <motion.div
-              key={cert.id ?? i}
-              initial={{ opacity: 0, y: 24 }}
+              key={item.id}
+              initial={{ opacity: 0, y: 28 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.08, duration: 0.55 }}
-              className="glass-card glass-card-hover p-6 group relative flex flex-col"
+              transition={{ duration: 0.5, delay: i * 0.09 }}
+              className="glass-card rounded-2xl p-5 group flex flex-col"
             >
-              <Award size={22} className="text-amber-400 mb-4" />
-              <h3 className="font-jakarta font-semibold text-[#E7D7C1] text-sm leading-snug mb-2 flex-1">
-                {cert.title}
-              </h3>
-              <p className="text-xs text-[#9A8878] font-jakarta mb-1">{cert.issuer}</p>
-              {cert.issue_date && (
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-jakarta font-semibold
-                  bg-amber-500/10 text-amber-400/80 border border-amber-500/15 mt-1 w-fit">
-                  {cert.issue_date}
-                </span>
-              )}
-              {cert.credential_url && (
-                <a href={cert.credential_url} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-amber-400 hover:text-amber-300 mt-3 transition-colors"
-                >
-                  View Credential <ExternalLink size={11} />
-                </a>
-              )}
-
-              {isAdmin && (
-                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button onClick={() => openEdit(cert)} className="p-1.5 rounded-full bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 transition-all">
-                    <Pencil size={12} />
-                  </button>
-                  {cert.id && (
-                    <button onClick={() => del(cert.id!)} className="p-1.5 rounded-full bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-all">
-                      <Trash2 size={12} />
-                    </button>
-                  )}
+              <div className="flex items-start justify-between gap-2 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-aqua flex items-center justify-center shrink-0">
+                  <Award size={18} className="text-white" />
                 </div>
+                {isAdmin && (
+                  <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-600">
+                      <Edit3 size={13} />
+                    </button>
+                    <button onClick={() => del(item.id)} className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500">
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <h3 className="font-jakarta font-semibold text-[#0F172A] text-sm leading-snug flex-1">
+                {item.name}
+              </h3>
+              <p className="text-teal-600 text-xs font-medium mt-1 font-jakarta">{item.issuer}</p>
+              {item.year && (
+                <span className="badge-secondary mt-2 self-start">{item.year}</span>
+              )}
+              {item.credential_url && (
+                <a
+                  href={item.credential_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex items-center gap-1 text-xs text-sky-600 hover:text-sky-700 font-jakarta font-medium transition-colors"
+                >
+                  View Credential <ExternalLink size={12} />
+                </a>
               )}
             </motion.div>
           ))}
         </div>
+
+        {isAdmin && (
+          <button onClick={openAdd} className="btn-outline mt-10 gap-2">
+            <Plus size={16} /> Add Certificate
+          </button>
+        )}
       </div>
 
       {editing !== null && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="glass-card w-full max-w-lg p-8">
-            <h3 className="font-playfair text-2xl font-bold gold-text mb-6">
-              {editing.id ? 'Edit Certificate' : 'Add Certificate'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+          <div className="glass-card rounded-2xl p-8 max-w-lg w-full shadow-xl">
+            <h3 className="font-playfair text-xl font-bold text-[#0F172A] mb-6">
+              {isNew ? 'Add Certificate' : 'Edit Certificate'}
             </h3>
-            <div className="flex flex-col gap-4">
-              {([
-                ['title',          'Certificate Title'],
-                ['issuer',         'Issuing Organisation'],
-                ['issue_date',     'Issue Date / Year'],
-                ['credential_url', 'Credential URL (optional)'],
-              ] as [keyof typeof form, string][]).map(([key, label]) => (
+            <div className="space-y-4">
+              {(
+                [
+                  ['Certificate Name', 'name'],
+                  ['Issuing Body',     'issuer'],
+                  ['Year',             'year'],
+                  ['Credential URL',   'credential_url'],
+                ] as [string, keyof Certificate][]
+              ).map(([label, key]) => (
                 <div key={key}>
-                  <label className="block text-xs text-amber-400/70 mb-1 font-jakarta tracking-wider uppercase">{label}</label>
+                  <label className="text-sm font-medium text-[#334155] block mb-1">{label}</label>
                   <input
-                    value={(form[key] ?? '') as string}
-                    onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                    className="w-full bg-white/5 border border-amber-500/20 rounded-lg px-3 py-2 text-sm text-[#E7D7C1] outline-none focus:border-amber-400/50 font-jakarta"
+                    className="input-field"
+                    value={String(form[key] ?? '')}
+                    onChange={e => setForm({ ...form, [key]: e.target.value })}
                   />
                 </div>
               ))}
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={save} disabled={saving} className="btn-gold font-jakarta text-sm">
+              <button onClick={save} disabled={saving} className="btn-primary flex-1 justify-center">
                 {saving ? 'Saving…' : 'Save'}
               </button>
-              <button onClick={() => setEditing(null)} className="btn-outline-gold font-jakarta text-sm">
-                Cancel
-              </button>
+              <button onClick={close} className="btn-outline flex-1 justify-center">Cancel</button>
             </div>
           </div>
         </div>

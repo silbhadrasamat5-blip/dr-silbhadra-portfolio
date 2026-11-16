@@ -1,51 +1,63 @@
 'use client'
-import { useRef, useState } from 'react'
+
+import { useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Pencil, Plus, Trash2, Briefcase, MapPin, Clock } from 'lucide-react'
+import { useRef } from 'react'
+import { Plus, Edit3, Trash2, Briefcase } from 'lucide-react'
 import { useAdmin } from '@/contexts/AdminContext'
 import { supabase } from '@/lib/supabase'
 import type { Experience } from '@/types'
 
-const fadeUp = {
-  hidden:  { opacity: 0, y: 28 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.15, duration: 0.65, ease: 'easeOut' } }),
+interface Props {
+  items: Experience[]
+  onRefresh: () => void
 }
 
-const blank: Omit<Experience, 'id'> = {
-  job_title: '', organization: '', location: '', duration: '', responsibilities: [], sort_order: 99,
+const BLANK: Partial<Experience> = {
+  role: '', company: '', location: '',
+  start_date: '', end_date: '', responsibilities: [],
 }
 
-export default function ExperienceSection({
-  experience, onRefresh,
-}: { experience: Experience[]; onRefresh: () => void }) {
-  const { isAdmin } = useAdmin()
-  const ref         = useRef(null)
-  const inView      = useInView(ref, { once: true, margin: '-60px' })
-
-  const [editing, setEditing] = useState<Experience | null>(null)
-  const [form,    setForm]    = useState<Omit<Experience,'id'>>(blank)
-  const [saving,  setSaving]  = useState(false)
+export default function ExperienceSection({ items, onRefresh }: Props) {
+  const { isAdmin }                   = useAdmin()
+  const ref                           = useRef(null)
+  const inView                        = useInView(ref, { once: true, margin: '-80px' })
+  const [editing, setEditing]         = useState<Experience | null>(null)
+  const [isNew,   setIsNew]           = useState(false)
+  const [form,    setForm]            = useState<Partial<Experience>>(BLANK)
+  const [saving,  setSaving]          = useState(false)
 
   const openEdit = (item: Experience) => {
+    setIsNew(false)
+    setForm({ ...item, responsibilities: item.responsibilities ?? [] })
     setEditing(item)
-    setForm({ ...item })
   }
   const openAdd = () => {
-    setEditing({ id: undefined, ...blank })
-    setForm({ ...blank, sort_order: (experience.length + 1) })
+    setIsNew(true)
+    setForm({ ...BLANK })
+    setEditing({} as Experience)
   }
+  const close = () => { setEditing(null); setIsNew(false) }
 
   const save = async () => {
     if (!supabase) return
     setSaving(true)
-    const payload = { ...form, responsibilities: form.responsibilities }
-    if (editing?.id) {
-      await supabase.from('experience').update(payload).eq('id', editing.id)
-    } else {
+    const payload = {
+      ...form,
+      responsibilities: Array.isArray(form.responsibilities)
+        ? form.responsibilities
+        : String(form.responsibilities || '')
+            .split('\n')
+            .map(s => s.trim())
+            .filter(Boolean),
+    }
+    if (isNew) {
       await supabase.from('experience').insert(payload)
+    } else {
+      await supabase.from('experience').update(payload).eq('id', editing!.id)
     }
     setSaving(false)
-    setEditing(null)
+    close()
     onRefresh()
   }
 
@@ -55,132 +67,140 @@ export default function ExperienceSection({
     onRefresh()
   }
 
-  return (
-    <section id="experience" className="py-24 bg-[#130E0B]" ref={ref}>
-      <div className="max-w-6xl mx-auto px-6 lg:px-16">
+  const setResp = (val: string) =>
+    setForm({ ...form, responsibilities: val.split('\n').map(s => s.trim()).filter(Boolean) })
 
-        <div className="flex items-start justify-between mb-12">
-          <div>
-            <span className="section-label">Career</span>
-            <h2 className="font-playfair text-4xl md:text-5xl font-bold gold-text">Professional Experience</h2>
-          </div>
-          {isAdmin && (
-            <button onClick={openAdd}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-300 text-sm font-jakarta hover:bg-amber-500/25 transition-all"
-            >
-              <Plus size={15} /> Add
-            </button>
-          )}
-        </div>
+  return (
+    <section id="experience" className="relative py-24 section-tint">
+      <div className="max-w-5xl mx-auto px-6" ref={ref}>
+
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-14"
+        >
+          <span className="section-label">Career Timeline</span>
+          <h2 className="font-playfair text-4xl font-bold text-[#0F172A] mt-1">
+            Professional Experience
+          </h2>
+        </motion.div>
 
         {/* Timeline */}
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-amber-500/50 via-amber-500/20 to-transparent hidden md:block" />
+          <div className="absolute left-6 top-0 bottom-0 w-0.5 timeline-line rounded-full hidden md:block" />
 
-          <div className="flex flex-col gap-10">
-            {experience.map((item, i) => (
+          <div className="space-y-8">
+            {items.map((item, i) => (
               <motion.div
-                key={item.id ?? i}
-                custom={i} variants={fadeUp}
-                initial="hidden" animate={inView ? 'visible' : 'hidden'}
-                className="md:pl-16 relative"
+                key={item.id}
+                initial={{ opacity: 0, x: -24 }}
+                animate={inView ? { opacity: 1, x: 0 } : {}}
+                transition={{ duration: 0.55, delay: i * 0.12 }}
+                className="relative md:pl-16"
               >
                 {/* Timeline dot */}
-                <div className="hidden md:flex absolute left-4 top-6 w-4 h-4 rounded-full border-2 border-amber-500 bg-[#130E0B] items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                </div>
+                <div className="absolute left-4 top-6 w-4 h-4 rounded-full bg-teal-500 border-2 border-white shadow-md hidden md:block" />
 
-                <div className="glass-card glass-card-hover p-7 group">
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <div>
-                      <h3 className="font-playfair text-xl font-bold text-amber-300 mb-1">{item.job_title}</h3>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-[#9A8878] font-jakarta">
-                        <span className="flex items-center gap-1.5"><Briefcase size={13} />{item.organization}</span>
-                        <span className="flex items-center gap-1.5"><MapPin size={13} />{item.location}</span>
-                        <span className="flex items-center gap-1.5 text-amber-400/70"><Clock size={13} />{item.duration}</span>
+                <div className="glass-card rounded-2xl p-6 group">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex gap-3 items-start">
+                      <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0 mt-0.5">
+                        <Briefcase size={18} className="text-teal-600" />
+                      </div>
+                      <div>
+                        <h3 className="font-playfair text-xl font-bold text-[#0F172A]">
+                          {item.role}
+                        </h3>
+                        <p className="text-teal-600 font-medium font-jakarta text-sm mt-0.5">
+                          {item.company}
+                          {item.location ? ` · ${item.location}` : ''}
+                        </p>
+                        <p className="text-xs text-[#64748B] font-jakarta mt-1">
+                          {item.start_date}
+                          {item.end_date ? ` – ${item.end_date}` : ' – Present'}
+                        </p>
                       </div>
                     </div>
                     {isAdmin && (
-                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => openEdit(item)} className="p-1.5 rounded-full bg-amber-500/15 text-amber-300 hover:bg-amber-500/25 transition-all">
-                          <Pencil size={13} />
+                      <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                        <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-600 transition-colors">
+                          <Edit3 size={15} />
                         </button>
-                        {item.id && (
-                          <button onClick={() => del(item.id!)} className="p-1.5 rounded-full bg-red-500/15 text-red-400 hover:bg-red-500/25 transition-all">
-                            <Trash2 size={13} />
-                          </button>
-                        )}
+                        <button onClick={() => del(item.id)} className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500 transition-colors">
+                          <Trash2 size={15} />
+                        </button>
                       </div>
                     )}
                   </div>
 
-                  <ul className="space-y-2.5">
-                    {item.responsibilities.map((r, j) => (
-                      <li key={j} className="flex gap-3 text-sm font-jakarta text-[#C4A882] leading-relaxed">
-                        <span className="text-amber-500/60 mt-1 shrink-0">▸</span>
-                        {r}
-                      </li>
-                    ))}
-                  </ul>
+                  {item.responsibilities?.length > 0 && (
+                    <ul className="mt-4 space-y-1.5 pl-2">
+                      {item.responsibilities.map((r, ri) => (
+                        <li key={ri} className="flex gap-2 text-sm text-[#334155] font-jakarta">
+                          <span className="text-teal-500 mt-1 shrink-0">▸</span>
+                          {r}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {isAdmin && (
+          <button onClick={openAdd} className="btn-outline mt-10 gap-2">
+            <Plus size={16} /> Add Experience
+          </button>
+        )}
       </div>
 
       {/* Edit / Add modal */}
       {editing !== null && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-          <div className="glass-card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8">
-            <h3 className="font-playfair text-2xl font-bold gold-text mb-6">
-              {editing.id ? 'Edit Experience' : 'Add Experience'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm px-4">
+          <div className="glass-card rounded-2xl p-8 max-w-lg w-full max-h-[82vh] overflow-y-auto shadow-xl">
+            <h3 className="font-playfair text-xl font-bold text-[#0F172A] mb-6">
+              {isNew ? 'Add Experience' : 'Edit Experience'}
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {([
-                ['job_title',    'Job Title'],
-                ['organization', 'Organization'],
-                ['location',     'Location'],
-                ['duration',     'Duration'],
-              ] as [keyof typeof form, string][]).map(([key, label]) => (
+            <div className="space-y-4">
+              {(
+                [
+                  ['Role / Title',  'role'],
+                  ['Company',       'company'],
+                  ['Location',      'location'],
+                  ['Start Date',    'start_date'],
+                  ['End Date',      'end_date'],
+                ] as [string, keyof Experience][]
+              ).map(([label, key]) => (
                 <div key={key}>
-                  <label className="block text-xs text-amber-400/70 mb-1 font-jakarta tracking-wider uppercase">{label}</label>
+                  <label className="text-sm font-medium text-[#334155] block mb-1">{label}</label>
                   <input
-                    value={(form[key] ?? '') as string}
-                    onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                    className="w-full bg-white/5 border border-amber-500/20 rounded-lg px-3 py-2 text-sm text-[#E7D7C1] outline-none focus:border-amber-400/50 font-jakarta"
+                    className="input-field"
+                    value={String(form[key] ?? '')}
+                    onChange={e => setForm({ ...form, [key]: e.target.value })}
                   />
                 </div>
               ))}
-              <div className="sm:col-span-2">
-                <label className="block text-xs text-amber-400/70 mb-1 font-jakarta tracking-wider uppercase">
+              <div>
+                <label className="text-sm font-medium text-[#334155] block mb-1">
                   Responsibilities (one per line)
                 </label>
                 <textarea
-                  rows={6}
-                  value={form.responsibilities.join('\n')}
-                  onChange={e => setForm(f => ({ ...f, responsibilities: e.target.value.split('\n').filter(Boolean) }))}
-                  className="w-full bg-white/5 border border-amber-500/20 rounded-lg px-3 py-2 text-sm text-[#E7D7C1] outline-none focus:border-amber-400/50 font-jakarta resize-none"
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-amber-400/70 mb-1 font-jakarta tracking-wider uppercase">Sort Order</label>
-                <input
-                  type="number"
-                  value={form.sort_order}
-                  onChange={e => setForm(f => ({ ...f, sort_order: +e.target.value }))}
-                  className="w-full bg-white/5 border border-amber-500/20 rounded-lg px-3 py-2 text-sm text-[#E7D7C1] outline-none focus:border-amber-400/50 font-jakarta"
+                  className="input-field min-h-[120px]"
+                  value={(form.responsibilities ?? []).join('\n')}
+                  onChange={e => setResp(e.target.value)}
                 />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
-              <button onClick={save} disabled={saving} className="btn-gold font-jakarta text-sm">
+              <button onClick={save} disabled={saving} className="btn-primary flex-1 justify-center">
                 {saving ? 'Saving…' : 'Save'}
               </button>
-              <button onClick={() => setEditing(null)} className="btn-outline-gold font-jakarta text-sm">
-                Cancel
-              </button>
+              <button onClick={close} className="btn-outline flex-1 justify-center">Cancel</button>
             </div>
           </div>
         </div>
