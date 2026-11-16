@@ -53,10 +53,9 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         }}
       />
 
-      {/* ── 3D Molecule — lower-middle & visible above overlay ───────────── */}
-<div className="hidden md:block absolute inset-0 z-10 pointer-events-none opacity-95">
+      {/* ── 3D Targeted Drug Delivery Nanosphere ─────────────────────────── */}
+      <div className="hidden md:block absolute inset-0 z-10 pointer-events-none opacity-95">
         <ThreeMoleculeCanvas />
-      </div>
       </div>
 
       {/* ── Hero content ─────────────────────────────────────────────────── */}
