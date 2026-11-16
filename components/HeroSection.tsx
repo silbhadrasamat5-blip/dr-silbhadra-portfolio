@@ -50,8 +50,8 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         }}
       />
 
-      {/* ── 3D Molecule — left background, behind text ──────────────────── */}
-      <div className="absolute inset-0 z-[2] pointer-events-none">
+     {/* ── 3D Molecule — positioned lower-middle so name stays 100% clear ── */}
+      <div className="absolute inset-x-0 bottom-[-6%] h-[68%] z- pointer-events-none opacity-65 flex items-center justify-center">
         <ThreeMoleculeCanvas />
       </div>
 
