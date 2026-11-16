@@ -3,20 +3,24 @@
 import { useEffect, useRef } from 'react'
 
 interface Props {
-  videoUrl: string
+  videoUrl?: string
 }
+
+const DEFAULT_VIDEO_URL =
+  'https://viakjhjyyflqwlqgsnah.supabase.co/storage/v1/object/public/portfolio-media/polished_video.mp4'
 
 /**
  * Fixed full-page background video.
- * - scale-[1.08] origin-top-left crops the bottom-right watermark off-screen.
+ * - Clean full-frame rendering without scale cropping (watermark-free video).
  * - Scroll-scrubbed via requestAnimationFrame + lerp; no autoplay loop.
  */
 export default function VideoBackground({ videoUrl }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const activeVideoUrl = videoUrl || DEFAULT_VIDEO_URL
 
   useEffect(() => {
     const video = videoRef.current
-    if (!video || !videoUrl) return
+    if (!video || !activeVideoUrl) return
 
     // Start paused at frame 0
     video.pause()
@@ -54,32 +58,18 @@ export default function VideoBackground({ videoUrl }: Props) {
       window.removeEventListener('scroll', handleScroll)
       cancelAnimationFrame(rafId)
     }
-  }, [videoUrl])
-
-  if (!videoUrl) {
-    // Gradient fallback when no video is configured
-    return (
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        style={{
-          background:
-            'linear-gradient(135deg, #E0F2FE 0%, #CCFBF1 45%, #F0FDF4 100%)',
-        }}
-      />
-    )
-  }
+  }, [activeVideoUrl])
 
   return (
     <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-      {/* scale-[1.08] crops the bottom-right watermark; origin-top-left keeps composition */}
       <video
         ref={videoRef}
-        src={videoUrl}
+        src={activeVideoUrl}
         muted
         preload="auto"
         playsInline
         crossOrigin="anonymous"
-        className="absolute inset-0 w-full h-full object-cover scale-[1.08] origin-top-left"
+        className="absolute inset-0 w-full h-full object-cover"
       />
       {/* Very subtle warm tint to harmonise with pearl white sections */}
       <div
