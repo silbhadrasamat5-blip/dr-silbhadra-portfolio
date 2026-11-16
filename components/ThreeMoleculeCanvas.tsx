@@ -3,40 +3,6 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
-// ── Aspirin-inspired pharmaceutical molecule ──────────────────────────────
-// Benzene ring + ester side-chain + carboxyl group
-const ATOMS: { p: [number, number, number]; type: 'C' | 'O' }[] = [
-  // Benzene ring (radius 1.4, XY plane)
-  { p: [1.4,  0.00,  0.00], type: 'C' },   // 0
-  { p: [0.7,  1.21,  0.00], type: 'C' },   // 1
-  { p: [-0.7, 1.21,  0.00], type: 'C' },   // 2
-  { p: [-1.4, 0.00,  0.00], type: 'C' },   // 3
-  { p: [-0.7,-1.21,  0.00], type: 'C' },   // 4
-  { p: [0.7, -1.21,  0.00], type: 'C' },   // 5
-
-  // Ester side chain (–O–C(=O)–CH₃) on atom 2
-  { p: [-1.10, 2.55,  0.40], type: 'O' },  // 6 ether-O
-  { p: [-2.30, 3.05,  0.50], type: 'C' },  // 7 carbonyl-C
-  { p: [-3.30, 2.30,  0.30], type: 'O' },  // 8 =O
-  { p: [-2.55, 4.35,  0.80], type: 'C' },  // 9 methyl-C
-
-  // Carboxyl (–COOH) on atom 1
-  { p: [1.00, 2.60, -0.30], type: 'C' },   // 10 carboxyl-C
-  { p: [2.30, 2.90, -0.50], type: 'O' },   // 11 =O
-  { p: [0.90, 3.90, -0.20], type: 'O' },   // 12 –OH
-]
-
-const BONDS: [number, number][] = [
-  // Ring
-  [0,1],[1,2],[2,3],[3,4],[4,5],[5,0],
-  // Ester branch
-  [2,6],[6,7],[7,8],[7,9],
-  // Carboxyl branch
-  [1,10],[10,11],[10,12],
-]
-
-const COLOR = { C: 0x0D9488, O: 0x0284C7 } as const
-
 export default function ThreeMoleculeCanvas() {
   const wrapRef = useRef<HTMLDivElement>(null)
 
@@ -53,183 +19,239 @@ export default function ThreeMoleculeCanvas() {
     renderer.setClearColor(0x000000, 0)
     el.appendChild(renderer.domElement)
 
-    // ── Camera ────────────────────────────────────────────
-    const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100)
-    camera.position.set(0, 0, 11)
+    // ── Camera (z = 14 ensures zero clipping at any edge) ──
+    const camera = new THREE.PerspectiveCamera(40, W / H, 0.1, 100)
+    camera.position.set(0, 0, 14)
 
     // ── Scene ─────────────────────────────────────────────
     const scene = new THREE.Scene()
 
-    // ── Lights ────────────────────────────────────────────
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55))
+    // ── Clinical Lighting ─────────────────────────────────
+    scene.add(new THREE.AmbientLight(0xffffff, 1.4))
 
-    const key = new THREE.DirectionalLight(0x60EFFF, 1.6)
-    key.position.set(4, 6, 6)
-    scene.add(key)
+    const keyLight = new THREE.DirectionalLight(0x0d9488, 2.4)
+    keyLight.position.set(6, 8, 10)
+    scene.add(keyLight)
 
-    const fill = new THREE.DirectionalLight(0x0284C7, 0.6)
-    fill.position.set(-4, 2, -4)
-    scene.add(fill)
+    const fillLight = new THREE.DirectionalLight(0x0284c7, 2.0)
+    fillLight.position.set(-6, -5, 8)
+    scene.add(fillLight)
 
-    const rim = new THREE.DirectionalLight(0x0D9488, 0.7)
-    rim.position.set(0, -5, -6)
-    scene.add(rim)
+    // ── Targeted Drug Delivery Nanosphere Group ───────────
+    const nanoGroup = new THREE.Group()
 
-    // ── Molecule group (offset left so portrait stays clear) ──
-    const mol = new THREE.Group()
-    mol.position.set(-1.6, 0.4, 0)
-    scene.add(mol)
+    // 1. Inner Active Drug Core (Clinical Aqua Green)
+    const coreGeo = new THREE.IcosahedronGeometry(0.72, 2)
+    const coreMat = new THREE.MeshStandardMaterial({
+      color: 0x0d9488,
+      emissive: 0x0f766e,
+      emissiveIntensity: 0.35,
+      roughness: 0.25,
+      metalness: 0.4,
+    })
+    const drugCore = new THREE.Mesh(coreGeo, coreMat)
+    nanoGroup.add(drugCore)
 
-    // ── Atom spheres ──────────────────────────────────────
-    ATOMS.forEach(({ p, type }) => {
-      const radius = type === 'C' ? 0.28 : 0.24
-      const color  = COLOR[type]
-      const geo = new THREE.SphereGeometry(radius, 32, 32)
-      const mat = new THREE.MeshPhongMaterial({
-        color,
-        specular: 0xffffff,
-        shininess: 110,
-        emissive: color,
-        emissiveIntensity: 0.10,
-      })
-      const mesh = new THREE.Mesh(geo, mat)
-      mesh.position.set(...p)
-      mol.add(mesh)
-
-      // Soft outer glow
-      const glowGeo = new THREE.SphereGeometry(radius * 2.2, 16, 16)
-      const glowMat = new THREE.MeshBasicMaterial({
-        color,
-        transparent: true,
-        opacity: 0.07,
-        side: THREE.BackSide,
-      })
-      const glow = new THREE.Mesh(glowGeo, glowMat)
-      glow.position.set(...p)
-      mol.add(glow)
+    // 2. Inner Active Drug Micro-Beads
+    const beadGeo = new THREE.SphereGeometry(0.11, 16, 16)
+    const beadMat = new THREE.MeshStandardMaterial({
+      color: 0x14b8a6,
+      roughness: 0.2,
+      metalness: 0.3,
+    })
+    const beadCoords = [
+      [0.95, 0.45, 0.3],
+      [-0.9, -0.4, 0.45],
+      [0.35, -0.95, -0.35],
+      [-0.4, 0.9, -0.4],
+      [0.65, -0.55, 0.65],
+      [-0.65, 0.55, 0.6],
+    ]
+    beadCoords.forEach(([bx, by, bz]) => {
+      const bead = new THREE.Mesh(beadGeo, beadMat)
+      bead.position.set(bx, by, bz)
+      nanoGroup.add(bead)
     })
 
-    // ── Bond cylinders ────────────────────────────────────
-    const bondMat = new THREE.MeshPhongMaterial({
-      color: 0x9DD4D0,
-      specular: 0xffffff,
-      shininess: 55,
+    // 3. Translucent Lipid/Crystal Carrier Shell
+    const shellGeo = new THREE.SphereGeometry(1.55, 28, 28)
+    const shellMat = new THREE.MeshPhysicalMaterial({
+      color: 0xe0f2fe,
       transparent: true,
-      opacity: 0.72,
+      opacity: 0.26,
+      roughness: 0.15,
+      metalness: 0.05,
+      depthWrite: false,
+    })
+    const lipidShell = new THREE.Mesh(shellGeo, shellMat)
+    nanoGroup.add(lipidShell)
+
+    // Subtle geometric lipid-bilayer mesh lines
+    const wireGeo = new THREE.IcosahedronGeometry(1.56, 2)
+    const wireMat = new THREE.MeshBasicMaterial({
+      color: 0x0d9488,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.15,
+    })
+    const lipidWire = new THREE.Mesh(wireGeo, wireMat)
+    nanoGroup.add(lipidWire)
+
+    // 4. Targeted Receptor-Binding Ligands / Pins (Sky Blue)
+    const pinDirections = [
+      new THREE.Vector3(1, 0.7, 0.4).normalize(),
+      new THREE.Vector3(-1, 0.6, 0.5).normalize(),
+      new THREE.Vector3(0.4, -1, 0.6).normalize(),
+      new THREE.Vector3(-0.6, -0.8, -0.5).normalize(),
+      new THREE.Vector3(0.8, -0.4, -0.7).normalize(),
+      new THREE.Vector3(-0.3, 0.9, -0.6).normalize(),
+      new THREE.Vector3(0, 0.2, 1).normalize(),
+      new THREE.Vector3(0.2, -0.2, -1).normalize(),
+    ]
+
+    const stalkMat = new THREE.MeshStandardMaterial({
+      color: 0x0284c7,
+      roughness: 0.3,
+      metalness: 0.5,
+    })
+    const tipMat = new THREE.MeshStandardMaterial({
+      color: 0x0369a1,
+      emissive: 0x0284c7,
+      emissiveIntensity: 0.25,
+      roughness: 0.2,
+      metalness: 0.4,
     })
 
-    BONDS.forEach(([i, j]) => {
-      const a = new THREE.Vector3(...ATOMS[i].p)
-      const b = new THREE.Vector3(...ATOMS[j].p)
-      const dir = new THREE.Vector3().subVectors(b, a)
-      const len = dir.length()
-      const mid = new THREE.Vector3().addVectors(a, b).multiplyScalar(0.5)
+    const stalkGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.42, 10)
+    const tipGeo = new THREE.SphereGeometry(0.11, 16, 16)
 
-      const geo  = new THREE.CylinderGeometry(0.07, 0.07, len, 12, 1)
-      const mesh = new THREE.Mesh(geo, bondMat.clone())
-      mesh.position.copy(mid)
+    pinDirections.forEach((dir) => {
+      const pinHolder = new THREE.Group()
 
-      dir.normalize()
-      const up = new THREE.Vector3(0, 1, 0)
-      if (Math.abs(dir.dot(up)) < 0.9999) {
-        mesh.quaternion.setFromUnitVectors(up, dir)
-      } else if (dir.y < 0) {
-        mesh.rotation.z = Math.PI
-      }
-      mol.add(mesh)
+      const stalk = new THREE.Mesh(stalkGeo, stalkMat)
+      stalk.position.y = 1.76
+      pinHolder.add(stalk)
+
+      const tip = new THREE.Mesh(tipGeo, tipMat)
+      tip.position.y = 1.98
+      pinHolder.add(tip)
+
+      pinHolder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir)
+      nanoGroup.add(pinHolder)
     })
 
-    // ── Floating particles ────────────────────────────────
-    const pCount = 160
-    const pPos   = new Float32Array(pCount * 3)
-    const pCol   = new Float32Array(pCount * 3)
+    // 5. Twin Clinical Orbital Rings
+    const ringGeo = new THREE.TorusGeometry(2.35, 0.022, 12, 80)
+    const ringMat1 = new THREE.MeshStandardMaterial({
+      color: 0x0d9488,
+      transparent: true,
+      opacity: 0.45,
+      roughness: 0.3,
+    })
+    const ringMat2 = new THREE.MeshStandardMaterial({
+      color: 0x0284c7,
+      transparent: true,
+      opacity: 0.4,
+      roughness: 0.3,
+    })
+
+    const orbitRing1 = new THREE.Mesh(ringGeo, ringMat1)
+    orbitRing1.rotation.x = Math.PI / 2.6
+    orbitRing1.rotation.y = 0.35
+    nanoGroup.add(orbitRing1)
+
+    const orbitRing2 = new THREE.Mesh(ringGeo, ringMat2)
+    orbitRing2.rotation.x = -Math.PI / 2.8
+    orbitRing2.rotation.y = -0.45
+    nanoGroup.add(orbitRing2)
+
+    // Positioned cleanly in the lower-middle gap (between text & portrait)
+    const basePos = { x: 0.35, y: -1.35 }
+    nanoGroup.position.set(basePos.x, basePos.y, 0)
+    nanoGroup.scale.setScalar(0.88)
+    scene.add(nanoGroup)
+
+    // ── Floating Bio-Particles ────────────────────────────
+    const pCount = 120
+    const pPos = new Float32Array(pCount * 3)
+    const pCol = new Float32Array(pCount * 3)
     const palette = [
-      new THREE.Color(0x0D9488),
-      new THREE.Color(0x0284C7),
-      new THREE.Color(0x14B8A6),
-      new THREE.Color(0x38BDF8),
+      new THREE.Color(0x0d9488),
+      new THREE.Color(0x0284c7),
+      new THREE.Color(0x14b8a6),
+      new THREE.Color(0x38bdf8),
     ]
     for (let i = 0; i < pCount; i++) {
-      pPos[i*3]   = (Math.random() - 0.5) * 16
-      pPos[i*3+1] = (Math.random() - 0.5) * 12
-      pPos[i*3+2] = (Math.random() - 0.5) * 7
-      const c = palette[Math.floor(Math.random() * palette.length)]
-      pCol[i*3]   = c.r
-      pCol[i*3+1] = c.g
-      pCol[i*3+2] = c.b
+      pPos[i * 3] = (Math.random() - 0.5) * 18
+      pPos[i * 3 + 1] = (Math.random() - 0.5) * 11
+      pPos[i * 3 + 2] = (Math.random() - 0.5) * 6 - 2
+      const c = palette[i % palette.length]
+      pCol[i * 3] = c.r
+      pCol[i * 3 + 1] = c.g
+      pCol[i * 3 + 2] = c.b
     }
     const pGeo = new THREE.BufferGeometry()
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3))
-    pGeo.setAttribute('color',    new THREE.BufferAttribute(pCol, 3))
+    pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3))
     const pMat = new THREE.PointsMaterial({
-      size: 0.07,
+      size: 0.065,
       vertexColors: true,
       transparent: true,
-      opacity: 0.45,
-      sizeAttenuation: true,
+      opacity: 0.55,
     })
     const particles = new THREE.Points(pGeo, pMat)
     scene.add(particles)
 
-    // ── Mouse drift ───────────────────────────────────────
-    let mx = 0, my = 0, cx = 0, cy = 0
-    const onMouse = (e: MouseEvent) => {
-      mx = (e.clientX / window.innerWidth  - 0.5) * 2
-      my = (e.clientY / window.innerHeight - 0.5) * 2
+    // ── Interactive Mouse & Resize ────────────────────────
+    let mouseX = 0
+    let mouseY = 0
+    const onMouseMove = (e: MouseEvent) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 0.45
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 0.35
     }
-    window.addEventListener('mousemove', onMouse)
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
 
-    // ── Resize ────────────────────────────────────────────
     const onResize = () => {
       if (!el) return
-      const w = el.clientWidth, h = el.clientHeight
+      const w = el.clientWidth || window.innerWidth
+      const h = el.clientHeight || window.innerHeight
       camera.aspect = w / h
       camera.updateProjectionMatrix()
       renderer.setSize(w, h)
     }
     window.addEventListener('resize', onResize)
 
-    // ── Animation loop ────────────────────────────────────
-    let frameId: number
-    const tick = () => {
-      frameId = requestAnimationFrame(tick)
-      const t = performance.now() * 0.001
+    let clock = 0
+    let rafId: number
+    const animate = () => {
+      clock += 0.015
 
-      mol.rotation.y = t * 0.38
-      mol.rotation.x = Math.sin(t * 0.22) * 0.14
+      nanoGroup.rotation.y += 0.005
+      drugCore.rotation.y -= 0.012
+      drugCore.rotation.x += 0.008
+      const pulse = 1 + Math.sin(clock * 2) * 0.04
+      drugCore.scale.setScalar(pulse)
 
-      particles.rotation.y = t * 0.025
-      particles.rotation.x = t * 0.012
+      orbitRing1.rotation.z += 0.004
+      orbitRing2.rotation.z -= 0.003
+      particles.rotation.y += 0.0008
 
-      cx += (mx * 1.4 - cx) * 0.03
-      cy += (-my * 0.9 - cy) * 0.03
-      camera.position.x = cx
-      camera.position.y = cy
-      camera.lookAt(0, 0, 0)
+      nanoGroup.rotation.x += (mouseY - nanoGroup.rotation.x) * 0.04
+      nanoGroup.position.x += (basePos.x + mouseX - nanoGroup.position.x) * 0.04
 
       renderer.render(scene, camera)
+      rafId = requestAnimationFrame(animate)
     }
-    tick()
+    animate()
 
-    // ── Cleanup ───────────────────────────────────────────
     return () => {
-      cancelAnimationFrame(frameId)
-      window.removeEventListener('mousemove', onMouse)
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('resize', onResize)
-      scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh || obj instanceof THREE.Points) {
-          obj.geometry.dispose()
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((m: THREE.Material) => m.dispose())
-          } else {
-            (obj.material as THREE.Material).dispose()
-          }
-        }
-      })
-      renderer.dispose()
-      if (el && renderer.domElement.parentNode === el) {
+      if (renderer.domElement && el.contains(renderer.domElement)) {
         el.removeChild(renderer.domElement)
       }
+      renderer.dispose()
     }
   }, [])
 
