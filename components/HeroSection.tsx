@@ -40,13 +40,17 @@ export default function HeroSection({ profile, onRefresh }: Props) {
   const cleanName = rawName.startsWith('Dr. ') ? rawName.slice(4) : rawName
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-     {/* ── Solid-to-Fade Pearl-Aqua Overlay ─────────────────────────────── */}
+    <section
+      id="about"
+      className="relative min-h-screen flex items-center overflow-hidden"
+    >
+      {/* ── Solid-to-Fade Pearl-Aqua Overlay ─────────────────────────────── */}
       <div
         className="absolute inset-0 z-0 pointer-events-none"
         style={{
           background:
             'linear-gradient(to right, #FAF9F6 0%, #F2FAFA 46%, rgba(242,250,250,0.92) 56%, rgba(250,249,246,0.2) 68%, transparent 80%)',
+        }}
       />
 
       {/* ── 3D Molecule — lower-middle & visible above overlay ───────────── */}
@@ -73,10 +77,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             transition={{ duration: 0.72, delay: 0.1 }}
             className="font-playfair text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#020617] leading-tight mt-2 mb-3 tracking-tight"
           >
-            Dr.{' '}
-            <span className="text-[#0F766E]">
-              {cleanName}
-            </span>
+            Dr. <span className="text-[#0F766E]">{cleanName}</span>
           </motion.h1>
 
           <motion.p
@@ -162,7 +163,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
       <a
         href="#education"
         aria-label="Scroll down"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[10] text-teal-700 animate-bounce"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-teal-700 animate-bounce"
       >
         <ChevronDown size={28} />
       </a>
@@ -191,7 +192,9 @@ export default function HeroSection({ profile, onRefresh }: Props) {
                 <input
                   type="text"
                   value={form.full_name ?? ''}
-                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, full_name: e.target.value })
+                  }
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
@@ -215,7 +218,9 @@ export default function HeroSection({ profile, onRefresh }: Props) {
                 <textarea
                   rows={3}
                   value={form.about_bio ?? ''}
-                  onChange={(e) => setForm({ ...form, about_bio: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, about_bio: e.target.value })
+                  }
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
@@ -227,7 +232,9 @@ export default function HeroSection({ profile, onRefresh }: Props) {
                 <input
                   type="text"
                   value={form.video_url ?? ''}
-                  onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, video_url: e.target.value })
+                  }
                   className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
