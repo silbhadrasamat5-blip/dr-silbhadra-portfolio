@@ -1,34 +1,34 @@
-import type { Metadata } from 'next'
-import { Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google'
-import './globals.css'
-import { AdminProvider } from '@/contexts/AdminContext'
-
-const playfair = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-playfair',
-  display: 'swap',
-})
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-jakarta',
-  display: 'swap',
-})
+import type { Metadata } from 'next';
+import './globals.css';
+import { AdminProvider } from '@/contexts/AdminContext';
 
 export const metadata: Metadata = {
-  title: 'Dr. Silbhadra Samat — Clinical Pharmacologist',
+  title: 'Dr. Silbhadra Samat | Clinical Pharmacology & Drug Safety',
   description:
-    'Portfolio of Dr. Silbhadra Samat — Pharm.D, Clinical Pharmacologist specializing in Pharmacovigilance, Drug Safety, and Clinical Research. Assistant Professor at Netaji College of Pharmacy, Bankura.',
-}
+    'Portfolio of Dr. Silbhadra Samat — Pharm.D, Clinical Pharmacologist, Pharmacovigilance & Drug Safety Specialist.',
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${playfair.variable} ${jakarta.variable}`}>
-      <body className="bg-[#FAF9F6] font-jakarta antialiased">
+    <html lang="en" className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://googleapis.com" />
+        <link rel="preconnect" href="https://gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+        className="bg-[#FAF9F6] text-[#0F172A] antialiased selection:bg-teal-600 selection:text-white"
+      >
         <AdminProvider>{children}</AdminProvider>
       </body>
     </html>
-  )
+  );
 }
