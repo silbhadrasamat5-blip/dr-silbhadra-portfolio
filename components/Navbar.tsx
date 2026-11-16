@@ -34,8 +34,8 @@ export default function Navbar({ adminBannerVisible = false }: Props) {
     <nav
       className={`fixed ${topOffset} left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/82 backdrop-blur-md border-b border-teal-100 shadow-sm'
-          : 'bg-transparent border-b border-transparent'
+          ? 'bg-[#FAF9F6]/95 backdrop-blur-md border-b border-teal-200/70 shadow-sm'
+          : 'bg-[#FAF9F6]/82 backdrop-blur-md border-b border-teal-100/60'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -45,18 +45,18 @@ export default function Navbar({ adminBannerVisible = false }: Props) {
           <div className="w-8 h-8 rounded-lg bg-gradient-aqua flex items-center justify-center shadow-sm">
             <FlaskConical size={16} className="text-white" />
           </div>
-          <span className="font-playfair font-bold text-[#0F172A] text-lg group-hover:text-teal-600 transition-colors">
+          <span className="font-playfair font-extrabold text-[#020617] text-lg group-hover:text-[#0F766E] transition-colors">
             Dr. Samat
           </span>
         </a>
 
         {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-7">
           {NAV_LINKS.map(({ label, href }) => (
             <a
               key={label}
               href={href}
-              className="text-sm font-medium text-[#334155] hover:text-teal-600 transition-colors font-jakarta"
+              className="text-sm font-semibold text-[#020617] hover:text-[#0F766E] transition-colors font-jakarta"
             >
               {label}
             </a>
@@ -69,8 +69,8 @@ export default function Navbar({ adminBannerVisible = false }: Props) {
             onClick={isAdmin ? logout : () => setShowLogin(true)}
             className={`p-2 rounded-lg transition-colors ${
               isAdmin
-                ? 'bg-teal-50 text-teal-600 hover:bg-teal-100'
-                : 'text-[#334155] hover:text-teal-600 hover:bg-teal-50'
+                ? 'bg-teal-100 text-[#0F766E] hover:bg-teal-200'
+                : 'text-[#020617] hover:text-[#0F766E] hover:bg-teal-50'
             }`}
             title={isAdmin ? 'Exit Admin Mode' : 'Admin Login'}
           >
@@ -80,7 +80,7 @@ export default function Navbar({ adminBannerVisible = false }: Props) {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 rounded-lg text-[#334155] hover:bg-teal-50 hover:text-teal-600 transition-colors"
+            className="md:hidden p-2 rounded-lg text-[#020617] hover:bg-teal-50 hover:text-[#0F766E] transition-colors"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -89,14 +89,14 @@ export default function Navbar({ adminBannerVisible = false }: Props) {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-teal-100 shadow-lg">
+        <div className="md:hidden bg-[#FAF9F6]/98 backdrop-blur-md border-t border-teal-100 shadow-lg">
           <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-3">
             {NAV_LINKS.map(({ label, href }) => (
               <a
                 key={label}
                 href={href}
                 onClick={() => setMobileOpen(false)}
-                className="text-[#334155] hover:text-teal-600 font-jakarta text-sm font-medium py-2 border-b border-teal-50 transition-colors"
+                className="text-[#020617] hover:text-[#0F766E] font-jakarta text-sm font-semibold py-2 border-b border-teal-50 transition-colors"
               >
                 {label}
               </a>
