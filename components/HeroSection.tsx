@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { Download, Mail, Edit3, ChevronDown } from 'lucide-react'
+import { Download, Mail, Edit3, ChevronDown, X, Check } from 'lucide-react'
 import { useAdmin } from '@/contexts/AdminContext'
 import { supabase } from '@/lib/supabase'
 import type { ProfileSettings } from '@/types'
@@ -19,9 +19,9 @@ interface Props {
 
 export default function HeroSection({ profile, onRefresh }: Props) {
   const { isAdmin } = useAdmin()
-  const [editing, setEditing]   = useState(false)
-  const [form,    setForm]       = useState({ ...profile })
-  const [saving,  setSaving]     = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [form, setForm] = useState<ProfileSettings>({ ...profile })
+  const [saving, setSaving] = useState(false)
 
   const save = async () => {
     if (!supabase) return
@@ -36,13 +36,12 @@ export default function HeroSection({ profile, onRefresh }: Props) {
 
   const bio = profile.about_bio ?? ''
   const bioSnippet = bio.length > 200 ? bio.slice(0, 200) + '…' : bio
- const rawName = profile.full_name ?? 'Silbhadra Samat'
+  const rawName = profile.full_name ?? 'Silbhadra Samat'
   const cleanName = rawName.startsWith('Dr. ') ? rawName.slice(4) : rawName
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-
-      {/* ── Solid-to-Fade Pearl-Aqua Overlay (পেছনের সাদা লেখা ১০০% ঢেকে রাখার জন্য) ── */}
+      {/* ── Solid-to-Fade Pearl-Aqua Overlay ─────────────────────────────── */}
       <div
         className="absolute inset-0 z-[1] pointer-events-none"
         style={{
@@ -59,7 +58,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
       {/* ── Hero content ─────────────────────────────────────────────────── */}
       <div className="relative z-[10] max-w-7xl mx-auto px-6 lg:px-14 py-28 w-full">
         <div className="max-w-2xl">
-
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
@@ -123,6 +121,18 @@ export default function HeroSection({ profile, onRefresh }: Props) {
                 Download CV
               </a>
             )}
+            {isAdmin && (
+              <button
+                onClick={() => {
+                  setForm({ ...profile })
+                  setEditing(true)
+                }}
+                className="btn-outline gap-2 border-teal-600 text-teal-700"
+              >
+                <Edit3 size={17} />
+                Edit Hero
+              </button>
+            )}
           </motion.div>
 
           <motion.div
@@ -132,15 +142,117 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             className="flex gap-10"
           >
             {[
-              { n: '6+',  label: 'Certifications' },
-              { n: '2+',  label: 'Years Experience' },
-              { n: '1',   label: 'Publication' },
+              { n: '6+', label: 'Certifications' },
+              { n: '2+', label: 'Years Experience' },
+              { n: '1', label: 'Publication' },
             ].map(({ n, label }) => (
               <div key={label}>
-                <div className="text-3xl font-extrabold font-playfair text-[#0F766E]">{n}</div>
-                <div className="text-sm text-[#0F172A] font-semibold font-jakarta">{label}</div>
+                <div className="text-3xl font-extrabold font-playfair text-[#0F766E]">
+                  {n}
+                </div>
+                <div className="text-sm text-[#0F172A] font-semibold font-jakarta">
+                  {label}
+                </div>
               </div>
             ))}
           </motion.div>
         </div>
       </div>
+
+      {/* ── Scroll Cue ───────────────────────────────────────────────────── */}
+      <a
+        href="#education"
+        aria-label="Scroll down"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[10] text-teal-700 animate-bounce"
+      >
+        <ChevronDown size={28} />
+      </a>
+
+      {/* ── Admin Edit Modal ─────────────────────────────────────────────── */}
+      {editing && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-playfair text-xl font-bold text-slate-900">
+                Edit Hero Profile
+              </h3>
+              <button
+                onClick={() => setEditing(false)}
+                className="text-slate-500 hover:text-slate-800"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Full Name (without Dr.)
+                </label>
+                <input
+                  type="text"
+                  value={form.full_name ?? ''}
+                  onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Professional Title
+                </label>
+                <input
+                  type="text"
+                  value={form.title ?? ''}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Short Bio
+                </label>
+                <textarea
+                  rows={3}
+                  value={form.about_bio ?? ''}
+                  onChange={(e) => setForm({ ...form, about_bio: e.target.value })}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Background Video URL
+                </label>
+                <input
+                  type="text"
+                  value={form.video_url ?? ''}
+                  onChange={(e) => setForm({ ...form, video_url: e.target.value })}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setEditing(false)}
+                className="px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={save}
+                disabled={saving}
+                className="btn-primary gap-2 text-sm"
+              >
+                <Check size={16} />
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
