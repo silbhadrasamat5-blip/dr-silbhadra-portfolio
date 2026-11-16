@@ -262,6 +262,8 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Start Year/Date
                   </label>
                   <input
@@ -271,3 +273,55 @@ export default function ExperienceSection({ items, onRefresh }: Props) {
                       setForm({ ...form, start_date: e.target.value })
                     }
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    End Date (blank = Present)
+                  </label>
+                  <input
+                    type="text"
+                    value={form.end_date ?? ''}
+                    onChange={(e) =>
+                      setForm({ ...form, end_date: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Key Responsibilities (one per line)
+                </label>
+                <textarea
+                  rows={4}
+                  value={respText}
+                  onChange={(e) => setRespText(e.target.value)}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={close}
+                className="px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={save}
+                disabled={saving}
+                className="btn-primary gap-2 text-sm"
+              >
+                <Check size={16} />
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
