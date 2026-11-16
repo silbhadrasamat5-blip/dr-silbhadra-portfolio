@@ -23,7 +23,7 @@ import AdminLoginModal       from '@/components/AdminLoginModal'
 
 // ── Static fallback data (shown when Supabase is not yet configured) ───────
 const DEFAULT_PROFILE: ProfileSettings = {
-  id: 1,
+  id: '1',
   full_name:  'Silbhadra Samat',
   title:      'Pharm.D · Pharmacovigilance · Drug Safety · Clinical Research',
   about_bio:  'Dedicated Clinical Pharmacologist with expertise in pharmacovigilance, drug safety monitoring, causality assessment (WHO-UMC & Naranjo Scale), and clinical pharmacy. Currently serving as Assistant Professor at Netaji College of Pharmacy, Bankura, West Bengal, with prior clinical experience at Vijay Krishna Multi-Specialty Hospital, Hyderabad.',
