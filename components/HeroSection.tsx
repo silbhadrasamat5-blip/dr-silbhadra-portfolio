@@ -36,7 +36,8 @@ export default function HeroSection({ profile, onRefresh }: Props) {
 
   const bio = profile.about_bio ?? ''
   const bioSnippet = bio.length > 200 ? bio.slice(0, 200) + '…' : bio
- const cleanName = (profile.full_name ?? 'Silbhadra Samat').replace('Dr. ', '').replace('Dr.', '')
+ const rawName = profile.full_name ?? 'Silbhadra Samat'
+  const cleanName = rawName.startsWith('Dr. ') ? rawName.slice(4) : rawName
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
