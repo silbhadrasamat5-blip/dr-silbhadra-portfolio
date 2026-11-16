@@ -17,48 +17,66 @@ export interface ProfileSettings {
 }
 
 export interface Education {
-  id?:              string
-  degree:           string
-  institution:      string
-  year_range:       string
-  grade_or_details: string
-  sort_order:       number
+  id?: string;
+  degree: string;
+  institution: string;
+  location?: string;
+  year_range?: string;
+  start_year?: string;
+  end_year?: string;
+  grade_or_details?: string;
+  description?: string;
+  sort_order?: number;
+  [key: string]: any;
 }
 
 export interface Experience {
-  id?:              string
-  job_title:        string
-  organization:     string
-  location:         string
-  duration:         string
-  responsibilities: string[]
-  sort_order:       number
+  id?: string;
+  job_title?: string;
+  role?: string;
+  title?: string;
+  organization?: string;
+  company?: string;
+  location?: string;
+  duration?: string;
+  start_date?: string;
+  end_date?: string;
+  responsibilities?: string;
+  description?: string;
+  sort_order?: number;
+  [key: string]: any;
 }
 
 export interface Certificate {
-  id?:            string
-  title:          string
-  issuer:         string
-  issue_date:     string
-  credential_url: string
-  sort_order:     number
+  id?: string;
+  title: string;
+  issuer: string;
+  issue_date?: string;
+  date?: string;
+  credential_url?: string;
+  credential_id?: string;
+  sort_order?: number;
+  [key: string]: any;
 }
 
 export interface PortfolioItem {
-  id?:        string
-  title:      string
-  category:   string
-  summary:    string
-  tags:       string[]
-  link:       string
-  created_at?: string
+  id?: string;
+  title: string;
+  category: string;
+  summary?: string;
+  description?: string;
+  tags?: string[] | string;
+  link?: string;
+  created_at?: string;
+  [key: string]: any;
 }
 
 export interface Inquiry {
-  id?:          string
-  name:         string
-  email:        string
-  organization: string
-  message:      string
-  created_at?:  string
+  id?: string;
+  name: string;
+  email: string;
+  organization?: string;
+  message: string;
+  created_at?: string;
+  [key: string]: any;
 }
