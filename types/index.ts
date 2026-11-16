@@ -10,8 +10,10 @@ export interface ProfileSettings {
   email: string;
   phone: string;
   linkedin_url?: string;
+  github_url?: string;
   cv_url?: string;
   video_url: string;
+  [key: string]: any;
 }
 
 export interface Education {
