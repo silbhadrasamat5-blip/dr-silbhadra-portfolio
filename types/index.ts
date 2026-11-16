@@ -1,15 +1,17 @@
 export interface ProfileSettings {
-  id?:          string
-  full_name:    string
-  headline:     string
-  tagline:      string
-  about_bio:    string
-  current_role: string
-  location:     string
-  email:        string
-  phone:        string
-  linkedin_url: string
-  video_url:    string
+  id: string;
+  full_name: string;
+  title?: string;
+  headline?: string;
+  tagline?: string;
+  about_bio: string;
+  current_role?: string;
+  location: string;
+  email: string;
+  phone: string;
+  linkedin_url?: string;
+  cv_url?: string;
+  video_url: string;
 }
 
 export interface Education {
