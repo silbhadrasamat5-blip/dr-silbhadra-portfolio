@@ -44,7 +44,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
       id="about"
       className="relative min-h-screen flex items-center overflow-hidden"
     >
-      {/* ── Mobile-Only Pearl-Aqua Backdrop Overlay (Keeps text crisp on mobile) ── */}
+      {/* Mobile-Only Pearl-Aqua Backdrop Overlay */}
       <div
         className="md:hidden absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -53,7 +53,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         }}
       />
 
-      {/* ── Desktop Solid-to-Fade Pearl-Aqua Overlay (100% unchanged for laptop) ── */}
+      {/* Desktop Solid-to-Fade Pearl-Aqua Overlay */}
       <div
         className="hidden md:block absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -62,12 +62,12 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         }}
       />
 
-      {/* ── 3D Targeted Drug Delivery Nanosphere (Desktop only) ───────────── */}
+      {/* 3D Targeted Drug Delivery Nanosphere (Desktop only) */}
       <div className="hidden md:block absolute inset-0 z-10 pointer-events-none opacity-95">
         <ThreeMoleculeCanvas />
       </div>
 
-      {/* ── Hero content ─────────────────────────────────────────────────── */}
+      {/* Hero content */}
       <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 lg:px-14 pt-24 pb-16 md:py-28 w-full">
         <div className="max-w-2xl">
           <motion.div
@@ -270,3 +270,9 @@ export default function HeroSection({ profile, onRefresh }: Props) {
                 className="btn-primary flex-1 justify-center gap-1.5"
               >
                 <Check size={16} />
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
