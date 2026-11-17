@@ -44,29 +44,38 @@ export default function HeroSection({ profile, onRefresh }: Props) {
       id="about"
       className="relative min-h-screen flex items-center overflow-hidden"
     >
-      {/* ── Solid-to-Fade Pearl-Aqua Overlay ─────────────────────────────── */}
+      {/* ── Mobile-Only Pearl-Aqua Backdrop Overlay (Keeps text crisp on mobile) ── */}
       <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="md:hidden absolute inset-0 z-0 pointer-events-none"
+        style={{
+          background:
+            'linear-gradient(180deg, rgba(250,249,246,0.92) 0%, rgba(242,250,250,0.88) 65%, rgba(250,249,246,0.95) 100%)',
+        }}
+      />
+
+      {/* ── Desktop Solid-to-Fade Pearl-Aqua Overlay (100% unchanged for laptop) ── */}
+      <div
+        className="hidden md:block absolute inset-0 z-0 pointer-events-none"
         style={{
           background:
             'linear-gradient(to right, #FAF9F6 0%, #F2FAFA 46%, rgba(242,250,250,0.92) 56%, rgba(250,249,246,0.2) 68%, transparent 80%)',
         }}
       />
 
-      {/* ── 3D Targeted Drug Delivery Nanosphere ─────────────────────────── */}
+      {/* ── 3D Targeted Drug Delivery Nanosphere (Desktop only) ───────────── */}
       <div className="hidden md:block absolute inset-0 z-10 pointer-events-none opacity-95">
         <ThreeMoleculeCanvas />
       </div>
 
       {/* ── Hero content ─────────────────────────────────────────────────── */}
-      <div className="relative z-20 max-w-7xl mx-auto px-6 lg:px-14 py-28 w-full">
+      <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 lg:px-14 pt-24 pb-16 md:py-28 w-full">
         <div className="max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="section-label text-[#0F766E] font-bold">
+            <span className="section-label text-[#0F766E] font-bold text-xs sm:text-sm">
               Clinical Pharmacologist &amp; Educator
             </span>
           </motion.div>
@@ -75,7 +84,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.72, delay: 0.1 }}
-            className="font-playfair text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#020617] leading-tight mt-2 mb-3 tracking-tight"
+            className="font-playfair text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-[#020617] leading-tight mt-2 mb-3 tracking-tight"
           >
             Dr. <span className="text-[#0F766E]">{cleanName}</span>
           </motion.h1>
@@ -84,7 +93,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl md:text-2xl font-bold text-[#0369A1] font-jakarta mb-5"
+            className="text-lg sm:text-xl md:text-2xl font-bold text-[#0369A1] font-jakarta mb-4 md:mb-5"
           >
             {profile.title ??
               'Pharm.D · Pharmacovigilance · Drug Safety · Clinical Research'}
@@ -94,7 +103,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-[#0F172A] font-medium text-lg leading-relaxed mb-8 max-w-xl"
+            className="text-[#0F172A] font-medium text-base md:text-lg leading-relaxed mb-7 md:mb-8 max-w-xl"
           >
             {bioSnippet ||
               'Dedicated Clinical Pharmacologist with expertise in pharmacovigilance, drug safety monitoring, and causality assessment. Faculty at Netaji College of Pharmacy, Bankura.'}
@@ -104,7 +113,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap gap-4 mb-10"
+            className="flex flex-wrap gap-3 sm:gap-4 mb-8 md:mb-10"
           >
             <a href="#contact" className="btn-primary gap-2">
               <Mail size={17} />
@@ -135,130 +144,129 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             )}
           </motion.div>
 
+          {/* Stats Row */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex gap-10"
+            className="flex flex-wrap gap-6 sm:gap-10 pt-4 border-t border-teal-900/10"
           >
-            {[
-              { n: '6+', label: 'Certifications' },
-              { n: '2+', label: 'Years Experience' },
-              { n: '1', label: 'Publication' },
-            ].map(({ n, label }) => (
-              <div key={label}>
-                <div className="text-3xl font-extrabold font-playfair text-[#0F766E]">
-                  {n}
-                </div>
-                <div className="text-sm text-[#0F172A] font-semibold font-jakarta">
-                  {label}
-                </div>
+            <div>
+              <div className="font-playfair text-2xl sm:text-3xl font-extrabold text-[#020617]">
+                {profile.cert_count ?? '6+'}
               </div>
-            ))}
+              <div className="text-xs font-semibold text-[#475569] font-jakarta">
+                Certifications
+              </div>
+            </div>
+            <div>
+              <div className="font-playfair text-2xl sm:text-3xl font-extrabold text-[#020617]">
+                {profile.exp_years ?? '2+'}
+              </div>
+              <div className="text-xs font-semibold text-[#475569] font-jakarta">
+                Years Experience
+              </div>
+            </div>
+            <div>
+              <div className="font-playfair text-2xl sm:text-3xl font-extrabold text-[#020617]">
+                {profile.pub_count ?? '1'}
+              </div>
+              <div className="text-xs font-semibold text-[#475569] font-jakarta">
+                Publication
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
 
-      {/* ── Scroll Cue ───────────────────────────────────────────────────── */}
+      {/* Scroll indicator */}
       <a
-        href="#education"
+        href="#experience"
         aria-label="Scroll down"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 text-teal-700 animate-bounce"
+        className="hidden md:flex absolute bottom-7 left-1/2 -translate-x-1/2 z-20 flex-col items-center text-[#0F766E] hover:text-[#020617] transition-colors animate-bounce"
       >
-        <ChevronDown size={28} />
+        <ChevronDown size={24} />
       </a>
 
-      {/* ── Admin Edit Modal ─────────────────────────────────────────────── */}
+      {/* Edit Hero Modal */}
       {editing && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-playfair text-xl font-bold text-slate-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-6 overflow-y-auto">
+          <div className="glass-card rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-xl my-auto max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-playfair text-xl font-bold text-[#0F172A]">
                 Edit Hero Profile
               </h3>
               <button
                 onClick={() => setEditing(false)}
-                className="text-slate-500 hover:text-slate-800"
+                className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="text-sm font-medium text-[#334155] block mb-1">
                   Full Name (without Dr.)
                 </label>
                 <input
-                  type="text"
+                  className="input-field"
                   value={form.full_name ?? ''}
                   onChange={(e) =>
                     setForm({ ...form, full_name: e.target.value })
                   }
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="text-sm font-medium text-[#334155] block mb-1">
                   Professional Title
                 </label>
                 <input
-                  type="text"
+                  className="input-field"
                   value={form.title ?? ''}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="text-sm font-medium text-[#334155] block mb-1">
                   Short Bio
                 </label>
                 <textarea
-                  rows={3}
+                  rows={4}
+                  className="input-field"
                   value={form.about_bio ?? ''}
                   onChange={(e) =>
                     setForm({ ...form, about_bio: e.target.value })
                   }
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                <label className="text-sm font-medium text-[#334155] block mb-1">
                   Background Video URL
                 </label>
                 <input
-                  type="text"
-                  value={form.video_url ?? ''}
+                  className="input-field"
+                  value={form.hero_video_url ?? ''}
                   onChange={(e) =>
-                    setForm({ ...form, video_url: e.target.value })
+                    setForm({ ...form, hero_video_url: e.target.value })
                   }
-                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900"
                 />
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setEditing(false)}
-                className="px-4 py-2 rounded-lg border border-slate-300 text-sm font-medium text-slate-700"
+                className="btn-outline flex-1 justify-center"
               >
                 Cancel
               </button>
               <button
                 onClick={save}
                 disabled={saving}
-                className="btn-primary gap-2 text-sm"
+                className="btn-primary flex-1 justify-center gap-1.5"
               >
                 <Check size={16} />
-                {saving ? 'Saving...' : 'Save Changes'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </section>
-  )
-}
