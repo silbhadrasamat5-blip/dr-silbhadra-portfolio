@@ -34,8 +34,7 @@ export default function HeroSection({ profile, onRefresh }: Props) {
     onRefresh()
   }
 
-  const bio = profile.about_bio ?? ''
-  const bioSnippet = bio
+  const bioSnippet = profile.about_bio ?? ''
   const rawName = profile.full_name ?? 'Silbhadra Samat'
   const cleanName = rawName.startsWith('Dr. ') ? rawName.slice(4) : rawName
 
@@ -44,7 +43,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
       id="about"
       className="relative min-h-screen flex items-center overflow-hidden"
     >
-      {/* Mobile-Only Pearl-Aqua Backdrop Overlay */}
       <div
         className="md:hidden absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -53,7 +51,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         }}
       />
 
-      {/* Desktop Solid-to-Fade Pearl-Aqua Overlay */}
       <div
         className="hidden md:block absolute inset-0 z-0 pointer-events-none"
         style={{
@@ -62,12 +59,10 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         }}
       />
 
-      {/* 3D Targeted Drug Delivery Nanosphere (Desktop only) */}
       <div className="hidden md:block absolute inset-0 z-10 pointer-events-none opacity-95">
         <ThreeMoleculeCanvas />
       </div>
 
-      {/* Hero content */}
       <div className="relative z-20 max-w-7xl mx-auto px-5 sm:px-6 lg:px-14 pt-24 pb-16 md:py-28 w-full">
         <div className="max-w-2xl">
           <motion.div
@@ -144,7 +139,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
             )}
           </motion.div>
 
-          {/* Stats Row */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -179,7 +173,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         </div>
       </div>
 
-      {/* Scroll indicator */}
       <a
         href="#experience"
         aria-label="Scroll down"
@@ -188,7 +181,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
         <ChevronDown size={24} />
       </a>
 
-      {/* Edit Hero Modal */}
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-6 overflow-y-auto">
           <div className="glass-card rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-xl my-auto max-h-[90vh] overflow-y-auto">
@@ -276,3 +268,6 @@ export default function HeroSection({ profile, onRefresh }: Props) {
           </div>
         </div>
       )}
+    </section>
+  )
+}
