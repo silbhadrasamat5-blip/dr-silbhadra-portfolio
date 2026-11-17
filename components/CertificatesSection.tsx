@@ -12,27 +12,69 @@ interface Props {
   onRefresh: () => void
 }
 
-const BLANK: Partial<Certificate> = { name: '', issuer: '', year: '', credential_url: '' }
+const BLANK = {
+  name: '',
+  issuer: '',
+  year: '',
+  credential_url: '',
+}
 
 export default function CertificatesSection({ items, onRefresh }: Props) {
-  const { isAdmin }               = useAdmin()
-  const ref                       = useRef(null)
-  const inView                    = useInView(ref, { once: true, margin: '-80px' })
-  const [editing, setEditing]     = useState<Certificate | null>(null)
-  const [isNew,   setIsNew]       = useState(false)
-  const [form,    setForm]        = useState<Partial<Certificate>>(BLANK)
-  const [saving,  setSaving]      = useState(false)
+  const { isAdmin } = useAdmin()
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const [editing, setEditing] = useState<Certificate | null>(null)
+  const [isNew, setIsNew] = useState(false)
+  const [form, setForm] = useState(BLANK)
+  const [saving, setSaving] = useState(false)
 
-  const openEdit = (item: Certificate) => { setIsNew(false); setForm({ ...item }); setEditing(item) }
-  const openAdd  = ()                  => { setIsNew(true);  setForm({ ...BLANK }); setEditing({} as Certificate) }
-  const close    = ()                  => { setEditing(null); setIsNew(false) }
+  const openEdit = (item: any) => {
+    setIsNew(false)
+    setForm({
+      name: item.name || item.title || '',
+      issuer: item.issuer || '',
+      year: item.year || '',
+      credential_url: item.credential_url || '',
+    })
+    setEditing(item)
+  }
+
+  const openAdd = () => {
+    setIsNew(true)
+    setForm({ ...BLANK })
+    setEditing({} as Certificate)
+  }
+
+  const close = () => {
+    setEditing(null)
+    setIsNew(false)
+  }
 
   const save = async () => {
     if (!supabase) return
     setSaving(true)
-    if (isNew) await supabase.from('certificates').insert(form)
-    else       await supabase.from('certificates').update(form).eq('id', editing!.id)
-    setSaving(false); close(); onRefresh()
+
+    const payload = {
+      name: form.name,
+      title: form.name,
+      issuer: form.issuer,
+      year: form.year,
+      credential_url: form.credential_url,
+    }
+
+    const { error } = isNew
+      ? await supabase.from('certificates').insert(payload)
+      : await supabase.from('certificates').update(payload).eq('id', editing!.id)
+
+    setSaving(false)
+
+    if (error) {
+      alert(`Save failed: ${error.message}`)
+      return
+    }
+
+    close()
+    onRefresh()
   }
 
   const del = async (id: string) => {
@@ -44,7 +86,6 @@ export default function CertificatesSection({ items, onRefresh }: Props) {
   return (
     <section id="certificates" className="relative py-24 section-tint">
       <div className="max-w-6xl mx-auto px-6" ref={ref}>
-
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -58,7 +99,7 @@ export default function CertificatesSection({ items, onRefresh }: Props) {
         </motion.div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item, i) => (
+          {items.map((item: any, i: number) => (
             <motion.div
               key={item.id}
               initial={{ opacity: 0, y: 28 }}
@@ -71,11 +112,17 @@ export default function CertificatesSection({ items, onRefresh }: Props) {
                   <Award size={18} className="text-white" />
                 </div>
                 {isAdmin && (
-                  <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => openEdit(item)} className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-600">
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => openEdit(item)}
+                      className="p-1.5 rounded-lg bg-teal-50 hover:bg-teal-100 text-teal-600"
+                    >
                       <Edit3 size={13} />
                     </button>
-                    <button onClick={() => del(item.id)} className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500">
+                    <button
+                      onClick={() => del(item.id)}
+                      className="p-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-500"
+                    >
                       <Trash2 size={13} />
                     </button>
                   </div>
@@ -83,9 +130,11 @@ export default function CertificatesSection({ items, onRefresh }: Props) {
               </div>
 
               <h3 className="font-jakarta font-semibold text-[#0F172A] text-sm leading-snug flex-1">
-                {item.name}
+                {item.name || item.title}
               </h3>
-              <p className="text-teal-600 text-xs font-medium mt-1 font-jakarta">{item.issuer}</p>
+              <p className="text-teal-600 text-xs font-medium mt-1 font-jakarta">
+                {item.issuer}
+              </p>
               {item.year && (
                 <span className="badge-secondary mt-2 self-start">{item.year}</span>
               )}
@@ -116,30 +165,43 @@ export default function CertificatesSection({ items, onRefresh }: Props) {
             <h3 className="font-playfair text-xl font-bold text-[#0F172A] mb-6">
               {isNew ? 'Add Certificate' : 'Edit Certificate'}
             </h3>
+
             <div className="space-y-4">
               {(
                 [
                   ['Certificate Name', 'name'],
-                  ['Issuing Body',     'issuer'],
-                  ['Year',             'year'],
-                  ['Credential URL',   'credential_url'],
-                ] as [string, keyof Certificate][]
+                  ['Issuing Body', 'issuer'],
+                  ['Year', 'year'],
+                  ['Credential URL', 'credential_url'],
+                ] as [string, keyof typeof BLANK][]
               ).map(([label, key]) => (
                 <div key={key}>
-                  <label className="text-sm font-medium text-[#334155] block mb-1">{label}</label>
+                  <label className="text-sm font-medium text-[#334155] block mb-1">
+                    {label}
+                  </label>
                   <input
                     className="input-field"
                     value={String(form[key] ?? '')}
-                    onChange={e => setForm({ ...form, [key]: e.target.value })}
+                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
                   />
                 </div>
               ))}
             </div>
+
             <div className="flex gap-3 mt-6">
-              <button onClick={save} disabled={saving} className="btn-primary flex-1 justify-center">
-                {saving ? 'Saving…' : 'Save'}
+              <button
+                onClick={save}
+                disabled={saving}
+                className="btn-primary flex-1 justify-center"
+              >
+                {saving ? 'Saving...' : 'Save'}
               </button>
-              <button onClick={close} className="btn-outline flex-1 justify-center">Cancel</button>
+              <button
+                onClick={close}
+                className="btn-outline flex-1 justify-center"
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
